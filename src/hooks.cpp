@@ -114,7 +114,7 @@ void DetourHook<T>::place()
 
 	LOG_DEBUG
 	(
-		"Detour hooked %s (%p) with hook at 0x%x and tramp at 0x%x\n",
+		"Detour hooked %s (%p) with hook at 0x%lx and tramp at 0x%lx\n",
 		this->name.c_str(),
 		reinterpret_cast<void*>(this->originalFn.address),
 		this->hookFn.address,
@@ -154,7 +154,7 @@ void VFTHook<T>::place()
 
 	LOG_DEBUG
 	(
-		"VFT hooked %s (0x%x) with hook at 0x%x\n",
+		"VFT hooked %s (0x%x) with hook at 0x%lx\n",
 		this->name.c_str(),
 		this->originalFn.address,
 		this->hookFn.address

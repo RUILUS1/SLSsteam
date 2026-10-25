@@ -232,7 +232,7 @@ void Apps::getLegacyCDKey(const AppId_t appId)
 	}
 }
 
-void Apps::getSubscribedApps(AppId_t* appList, const size_t size, uint32_t& count)
+void Apps::getSubscribedApps(AppId_t* appList, const uint32_t size, uint32_t& count)
 {
 	const auto addedApps = g_config.addedAppIds.get();
 

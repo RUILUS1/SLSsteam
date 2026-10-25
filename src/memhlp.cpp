@@ -274,7 +274,7 @@ lm_address_t MemHlp::findPrologue(const lm_address_t address, const std::vector<
 bool MemHlp::fixPICThunkCall(const char* name, const lm_address_t fn, const lm_address_t tramp)
 {
 	LOG_DEBUG("Fixing PIC thunks for %s's trampoline\n", name);
-	constexpr unsigned int maxBytes = 0x5; //Minimum bytes needed to detour a function, so our tramp will at least be of this size
+	constexpr unsigned int maxBytes = 0xE; //Minimum bytes needed to detour a function, so our tramp will at least be of this size
 	
 	lm_inst_t inst;
 	for (unsigned int curTrampOffset = 0; curTrampOffset <= maxBytes; )
@@ -283,12 +283,12 @@ bool MemHlp::fixPICThunkCall(const char* name, const lm_address_t fn, const lm_a
 
 		if (!LM_Disassemble(startAddress, &inst))
 		{
-			LOG_ERROR("Unable to dissassemble code at 0x%x\n", tramp + curTrampOffset);
+			LOG_ERROR("Unable to dissassemble code at 0x%lx\n", tramp + curTrampOffset);
 			return false;
 		}
 		
 		curTrampOffset += inst.size;
-		LOG_DEBUG("0x%x: %s %s\n", inst.address, inst.mnemonic, inst.op_str);
+		LOG_DEBUG("0x%lx: %s %s\n", inst.address, inst.mnemonic, inst.op_str);
 		
 		if (strcmp(inst.mnemonic, "call") != 0)
 		{
@@ -296,7 +296,7 @@ bool MemHlp::fixPICThunkCall(const char* name, const lm_address_t fn, const lm_a
 		}
 
 		//Calculate the call address manually with it's original location
-		lm_address_t followAddress = fn + curTrampOffset + *reinterpret_cast<lm_address_t*>(startAddress + 1);
+		lm_address_t followAddress = fn + curTrampOffset + static_cast<lm_address_t>(static_cast<int64_t>(*reinterpret_cast<int32_t*>(startAddress + 1)));
 		bool isIPCThunk = true;
 		char newInstr[sizeof(inst.mnemonic) + sizeof(inst.op_str)];
 
@@ -304,13 +304,13 @@ bool MemHlp::fixPICThunkCall(const char* name, const lm_address_t fn, const lm_a
 		{
 			if (!LM_Disassemble(followAddress, &inst))
 			{
-				LOG_ERROR("Unable to dissassemble code at 0x%x\n", followAddress);
+				LOG_ERROR("Unable to dissassemble code at 0x%lx\n", followAddress);
 				return false;
 			}
 
 			followAddress += inst.size;
 
-			LOG_DEBUG("0x%x: %s %s\n", inst.address, inst.mnemonic, inst.op_str);
+			LOG_DEBUG("0x%lx: %s %s\n", inst.address, inst.mnemonic, inst.op_str);
 
 			//Can not declare in switch statement
 			auto splits = std::vector<std::string>();
@@ -358,7 +358,7 @@ bool MemHlp::fixPICThunkCall(const char* name, const lm_address_t fn, const lm_a
 		LM_ProtMemory(startAddress, inst.size, LM_PROT_XRW, &oldProt);
 		LM_WriteMemory(startAddress, inst.bytes, inst.size);
 		LM_ProtMemory(startAddress, inst.size, oldProt, nullptr);
-		LOG_DEBUG("Replaced PIC thunk call for %s at 0x%x with %s\n", name, followAddress, newInstr);
+		LOG_DEBUG("Replaced PIC thunk call for %s at 0x%lx with %s\n", name, followAddress, newInstr);
 		return true;
 	}
 

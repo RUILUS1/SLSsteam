@@ -124,7 +124,7 @@ std::string CLog::buildNotification(const LogLevelFlags_t flags, const char* msg
 	return notifySS.str();
 }
 
-void CLog::__log(const LogLevelFlags_t flags, const char* file, const char* function, const int line, const char* msg, const va_list& vArgs)
+void CLog::__log(const LogLevelFlags_t flags, const char* file, const char* function, const int line, const char* msg, va_list vArgs)
 {
 	if (!(g_config.logLevels.copy() & flags))
 	{
@@ -194,32 +194,32 @@ void CLog::__log(const LogLevelFlags_t flags, const char* file, const char* func
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
-void CLog::__trace(const char* file, const char* function, const int line, const char* msg, const va_list& vArgs)
+void CLog::__trace(const char* file, const char* function, const int line, const char* msg, va_list vArgs)
 {
 #ifdef TRACE
 	__log(k_ELogLevelTrace, file, function, line, msg, vArgs);
 #endif
 }
-void CLog::__traceOnce(const char* file, const char* function, const int line, const char* msg, const va_list& vArgs)
+void CLog::__traceOnce(const char* file, const char* function, const int line, const char* msg, va_list vArgs)
 {
 #ifdef TRACE
 	__log(k_ELogLevelTrace | k_ELogLevelOnce, file, function, line, msg, vArgs);
 #endif
 }
 
-void CLog::__once(const char* file, const char* function, const int line, const char* msg, const va_list& vArgs)
+void CLog::__once(const char* file, const char* function, const int line, const char* msg, va_list vArgs)
 {
 #ifdef DEBUG
 	__log(k_ELogLevelOnce, file, function, line, msg, vArgs);
 #endif
 }
-void CLog::__debug(const char* file, const char* function, const int line, const char* msg, const va_list& vArgs)
+void CLog::__debug(const char* file, const char* function, const int line, const char* msg, va_list vArgs)
 {
 #ifdef DEBUG
 	__log(k_ELogLevelDebug, file, function, line, msg, vArgs);
 #endif
 }
-void CLog::__debugOnce(const char* file, const char* function, const int line, const char* msg, const va_list& vArgs)
+void CLog::__debugOnce(const char* file, const char* function, const int line, const char* msg, va_list vArgs)
 {
 #ifdef DEBUG
 	__log(k_ELogLevelDebug | k_ELogLevelOnce, file, function, line, msg, vArgs);
